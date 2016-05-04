@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cloudfoundry/cli/cf/configuration/config_helpers"
-	"github.com/cloudfoundry/cli/cf/configuration/core_config"
+	"github.com/cloudfoundry/cli/cf/configuration/confighelpers"
+	"github.com/cloudfoundry/cli/cf/configuration/coreconfig"
 	"github.com/cloudfoundry/cli/plugin"
 	"github.com/mitchellh/colorstring"
 )
@@ -24,13 +24,17 @@ func main() {
 type InfoPlugin struct{}
 
 func (plugin InfoPlugin) Run(cliConnection plugin.CliConnection, args []string) {
-	confRepo := core_config.NewRepositoryFromFilepath(config_helpers.DefaultFilePath(), fatalIf)
+	configPath, err := confighelpers.DefaultFilePath()
+	if err != nil {
+		fatalIf(err)
+	}
+	confRepo := coreconfig.NewRepositoryFromFilepath(configPath, fatalIf)
 	fmt.Println(colorstring.Color("Current User Info"))
 	fmt.Println(colorstring.Color("User: [bold][cyan]" + confRepo.UserEmail()))
 	fmt.Println(colorstring.Color("Org: [bold][cyan]" + confRepo.OrganizationFields().Name))
 	fmt.Println(colorstring.Color("Space: [bold][cyan]" + confRepo.SpaceFields().Name))
-	fmt.Println(colorstring.Color("API Version: [bold][cyan]" + confRepo.ApiVersion()))
-	fmt.Println(colorstring.Color("API Endpoint: [bold][cyan]" + confRepo.ApiEndpoint()))
+	fmt.Println(colorstring.Color("API Version: [bold][cyan]" + confRepo.APIVersion()))
+	fmt.Println(colorstring.Color("API Endpoint: [bold][cyan]" + confRepo.APIEndpoint()))
 }
 
 func (InfoPlugin) GetMetadata() plugin.PluginMetadata {
